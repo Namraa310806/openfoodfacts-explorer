@@ -62,6 +62,7 @@
 	});
 
 	let useWCFolksonomyEditor = $state(false);
+	let folksonomyEditor = $state<(HTMLElement & { authToken?: string }) | undefined>();
 
 	let showBarcode = $state(false);
 
@@ -147,6 +148,12 @@
 	}
 
 	let productAttributes = $derived(getProductAttributes(product.code));
+
+	$effect(() => {
+		if (folksonomyEditor != null) {
+			folksonomyEditor.authToken = $userAuthTokens?.access_token ?? '';
+		}
+	});
 </script>
 
 <Metadata
@@ -202,11 +209,7 @@
 			</label>
 
 			{#if useWCFolksonomyEditor}
-				<!-- TODO: This solution is far from optimal. Embedding tokens into the DOM is a security risk -->
-				<folksonomy-editor
-					page-type="edit"
-					product-code={product.code}
-					auth-token={$userAuthTokens?.access_token ?? ''}
+				<folksonomy-editor bind:this={folksonomyEditor} page-type="edit" product-code={product.code}
 				></folksonomy-editor>
 			{:else}
 				<h1 class="my-4 text-4xl font-bold">{$_('product.folksonomy.title_beta')}</h1>
